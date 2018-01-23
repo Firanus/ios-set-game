@@ -14,6 +14,8 @@
 		F5DFBE1820173EDB00D732A6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5DFBE1620173EDB00D732A6 /* LaunchScreen.storyboard */; };
 		F5DFBE20201749E700D732A6 /* Set.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE1F201749E700D732A6 /* Set.swift */; };
 		F5DFBE2220178FCE00D732A6 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE2120178FCE00D732A6 /* Card.swift */; };
+		F5DFBE262017AAB600D732A6 /* TripleComparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE252017AAB600D732A6 /* TripleComparable.swift */; };
+		F5DFBE282017AABD00D732A6 /* EnumCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE272017AABD00D732A6 /* EnumCollection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,8 @@
 		F5DFBE1920173EDB00D732A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F5DFBE1F201749E700D732A6 /* Set.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Set.swift; sourceTree = "<group>"; };
 		F5DFBE2120178FCE00D732A6 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
+		F5DFBE252017AAB600D732A6 /* TripleComparable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripleComparable.swift; sourceTree = "<group>"; };
+		F5DFBE272017AABD00D732A6 /* EnumCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnumCollection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +70,8 @@
 				F5DFBE1920173EDB00D732A6 /* Info.plist */,
 				F5DFBE1F201749E700D732A6 /* Set.swift */,
 				F5DFBE2120178FCE00D732A6 /* Card.swift */,
+				F5DFBE252017AAB600D732A6 /* TripleComparable.swift */,
+				F5DFBE272017AABD00D732A6 /* EnumCollection.swift */,
 			);
 			path = Set;
 			sourceTree = "<group>";
@@ -144,6 +150,8 @@
 			files = (
 				F5DFBE1020173EDB00D732A6 /* ViewController.swift in Sources */,
 				F5DFBE0E20173EDB00D732A6 /* AppDelegate.swift in Sources */,
+				F5DFBE282017AABD00D732A6 /* EnumCollection.swift in Sources */,
+				F5DFBE262017AAB600D732A6 /* TripleComparable.swift in Sources */,
 				F5DFBE20201749E700D732A6 /* Set.swift in Sources */,
 				F5DFBE2220178FCE00D732A6 /* Card.swift in Sources */,
 			);
