@@ -12,6 +12,8 @@
 		F5DFBE1320173EDB00D732A6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5DFBE1120173EDB00D732A6 /* Main.storyboard */; };
 		F5DFBE1520173EDB00D732A6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F5DFBE1420173EDB00D732A6 /* Assets.xcassets */; };
 		F5DFBE1820173EDB00D732A6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5DFBE1620173EDB00D732A6 /* LaunchScreen.storyboard */; };
+		F5DFBE20201749E700D732A6 /* Set.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE1F201749E700D732A6 /* Set.swift */; };
+		F5DFBE2220178FCE00D732A6 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE2120178FCE00D732A6 /* Card.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +24,8 @@
 		F5DFBE1420173EDB00D732A6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F5DFBE1720173EDB00D732A6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F5DFBE1920173EDB00D732A6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F5DFBE1F201749E700D732A6 /* Set.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Set.swift; sourceTree = "<group>"; };
+		F5DFBE2120178FCE00D732A6 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +64,8 @@
 				F5DFBE1420173EDB00D732A6 /* Assets.xcassets */,
 				F5DFBE1620173EDB00D732A6 /* LaunchScreen.storyboard */,
 				F5DFBE1920173EDB00D732A6 /* Info.plist */,
+				F5DFBE1F201749E700D732A6 /* Set.swift */,
+				F5DFBE2120178FCE00D732A6 /* Card.swift */,
 			);
 			path = Set;
 			sourceTree = "<group>";
@@ -138,6 +144,8 @@
 			files = (
 				F5DFBE1020173EDB00D732A6 /* ViewController.swift in Sources */,
 				F5DFBE0E20173EDB00D732A6 /* AppDelegate.swift in Sources */,
+				F5DFBE20201749E700D732A6 /* Set.swift in Sources */,
+				F5DFBE2220178FCE00D732A6 /* Card.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
