@@ -14,6 +14,9 @@ class Set {
     var selectedCards = [Card]()
     var matchedCards = [Card]()
     var score = 0
+    var isComplete: Bool {
+        return matchedCards.count == Int(pow(Double(Card.CardProperty.allValues.count), 4.0))
+    }
     
     init() {
         let numberOfVariations = Card.CardProperty.allValues.count
@@ -31,8 +34,8 @@ class Set {
         }
         
         //Shuffle the cards
-        for k in stride(from: cardsInPlay.count - 1, to: 0, by: -1) {
-            cardsInPlay.swapAt(Int(arc4random_uniform(UInt32(k + 1))), k)
+        for k in stride(from: unPlayedCards.count - 1, to: 0, by: -1) {
+            unPlayedCards.swapAt(Int(arc4random_uniform(UInt32(k + 1))), k)
         }
         
         for _ in 0..<12 {
@@ -41,26 +44,44 @@ class Set {
     }
     
     func chooseCard(at index: Int) {
-        let selectedCard = cardsInPlay[index]
-        if selectedCards.count == 3 {
-            if Card.doFormSetOfThree(first: selectedCards[0], second: selectedCards[1], third: selectedCards[2]) {
-                score += 3
-                
-                matchedCards.append(contentsOf: selectedCards)
-                cardsInPlay = cardsInPlay.filter { !selectedCards.contains($0) }
-                if !unPlayedCards.isEmpty {
-                    cardsInPlay.append(contentsOf: unPlayedCards[0..<3])
-                    unPlayedCards.removeSubrange(0..<3)
+        if index < cardsInPlay.count {
+            let selectedCard = cardsInPlay[index]
+            var indexOfPreviouslySelectedCard = selectedCards.index(of: selectedCard)
+            
+            if selectedCards.count == 3 {
+                if matchedCards.contains(selectedCards[0]){
+                    cardsInPlay = cardsInPlay.filter { !selectedCards.contains($0) }
+                    if !unPlayedCards.isEmpty {
+                        cardsInPlay.append(contentsOf: unPlayedCards[0..<3])
+                        unPlayedCards.removeSubrange(0..<3)
+                    }
                 }
-            } else {
-                score -= 5
+                indexOfPreviouslySelectedCard = nil
+                selectedCards.removeAll()
+            } else if selectedCards.count == 2 {                
+                if Card.doFormSetOfThree(first: selectedCards[0], second: selectedCards[1], third: selectedCard) {
+                    score += 3
+                    
+                    matchedCards.append(selectedCard)
+                    matchedCards.append(contentsOf: selectedCards)
+                } else {
+                    score -= 5
+                }
             }
-            selectedCards.removeAll()
+            if indexOfPreviouslySelectedCard != nil {
+                selectedCards.remove(at: indexOfPreviouslySelectedCard!)
+            } else {
+                selectedCards.append(selectedCard)
+            }
+            
         }
-        if let indexOfPreviouslySelectedCard = selectedCards.index(of: selectedCard) {
-            selectedCards.remove(at: indexOfPreviouslySelectedCard)
-        } else {
-            selectedCards.append(selectedCard)
+    }
+    
+    func drawCards() {
+        if !unPlayedCards.isEmpty {
+            for _ in 0..<3 {
+                cardsInPlay.append(unPlayedCards.popLast()!)
+            }
         }
     }
 }

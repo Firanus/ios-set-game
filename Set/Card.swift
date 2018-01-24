@@ -16,7 +16,7 @@ struct Card {
     let shading: CardProperty
     
     enum CardProperty: Int, TripleComparable, EnumCollection {
-        case primary
+        case primary = 1
         case secondary
         case tertiary
     }
