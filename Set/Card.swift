@@ -15,13 +15,13 @@ struct Card {
     let shape: CardProperty
     let shading: CardProperty
     
-    enum CardProperty: TripleComparable, EnumCollection {
+    enum CardProperty: Int, TripleComparable, EnumCollection {
         case primary
         case secondary
         case tertiary
     }
     
-    static func formSetOfThree(first: Card, second: Card, third: Card) -> Bool {
+    static func doFormSetOfThree(first: Card, second: Card, third: Card) -> Bool {
         let colorsMatch = CardProperty.allIdentical(first: first.color, second: second.color, third: third.color) ||
             CardProperty.allDistinct(first: first.color, second: second.color, third: third.color)
         let numbersMatch = CardProperty.allIdentical(first: first.number, second: second.number, third: third.number) ||
@@ -32,5 +32,15 @@ struct Card {
             CardProperty.allDistinct(first: first.shading, second: second.shading, third: third.shading)
         
         return colorsMatch && numbersMatch && shapesMatch && shadingsMatch
+    }
+}
+
+extension Card: Hashable {
+    var hashValue: Int {
+        return (color.rawValue) + (number.rawValue * 3) + (shape.rawValue * 9) + (shading.rawValue * 27)
+    }
+    
+    static func ==(lhs: Card, rhs: Card) -> Bool {
+        return lhs.hashValue == rhs.hashValue
     }
 }
