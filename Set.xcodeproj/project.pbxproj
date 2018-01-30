@@ -68,12 +68,20 @@
 				F5DFBE1420173EDB00D732A6 /* Assets.xcassets */,
 				F5DFBE1620173EDB00D732A6 /* LaunchScreen.storyboard */,
 				F5DFBE1920173EDB00D732A6 /* Info.plist */,
+				F5E865C62020BCA800A52E05 /* Model */,
+			);
+			path = Set;
+			sourceTree = "<group>";
+		};
+		F5E865C62020BCA800A52E05 /* Model */ = {
+			isa = PBXGroup;
+			children = (
 				F5DFBE1F201749E700D732A6 /* Set.swift */,
 				F5DFBE2120178FCE00D732A6 /* Card.swift */,
 				F5DFBE252017AAB600D732A6 /* TripleComparable.swift */,
 				F5DFBE272017AABD00D732A6 /* EnumCollection.swift */,
 			);
-			path = Set;
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
