@@ -38,9 +38,7 @@ class Set {
             unPlayedCards.swapAt(Int(arc4random_uniform(UInt32(k + 1))), k)
         }
         
-        for _ in 0..<12 {
-            cardsInPlay.append(unPlayedCards.popLast()!)
-        }
+        drawMultipleCards(number: 12)
     }
     
     func chooseCard(at index: Int) {
@@ -49,16 +47,15 @@ class Set {
             var indexOfPreviouslySelectedCard = selectedCards.index(of: selectedCard)
             
             if selectedCards.count == 3 {
+                // Remove matched cards
                 if matchedCards.contains(selectedCards[0]){
                     cardsInPlay = cardsInPlay.filter { !selectedCards.contains($0) }
-                    if !unPlayedCards.isEmpty {
-                        cardsInPlay.append(contentsOf: unPlayedCards[0..<3])
-                        unPlayedCards.removeSubrange(0..<3)
-                    }
+                    drawMultipleCards(number: 3)
                 }
                 indexOfPreviouslySelectedCard = nil
                 selectedCards.removeAll()
-            } else if selectedCards.count == 2 {                
+            } else if selectedCards.count == 2 {
+                //score successful and unsuccessful matches
                 if Card.doFormSetOfThree(first: selectedCards[0], second: selectedCards[1], third: selectedCard) {
                     score += 3
                     
@@ -77,11 +74,12 @@ class Set {
         }
     }
     
-    func drawCards() {
-        if !unPlayedCards.isEmpty {
-            for _ in 0..<3 {
-                cardsInPlay.append(unPlayedCards.popLast()!)
-            }
+    func drawMultipleCards(number: Int) {
+        if !unPlayedCards.isEmpty && unPlayedCards.count >= number {
+            cardsInPlay.append(contentsOf: unPlayedCards[0..<number])
+            unPlayedCards.removeSubrange(0..<number)
+        } else {
+            assertionFailure("You've tried to draw more cards than there are in the deck.")
         }
     }
 }

@@ -34,7 +34,7 @@ class ViewController: UIViewController {
         if game.isComplete {
             game = Set()
         } else if game.cardsInPlay.count < cardButtons.count {
-            game.drawCards()
+            game.drawMultipleCards(number: 3)
         }
         updateViewFromModel()
     }
