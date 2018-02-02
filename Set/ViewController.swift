@@ -21,7 +21,9 @@ class ViewController: UIViewController {
     @IBOutlet weak var bottomButton: UIButton!
     @IBOutlet weak var gameView: SetGameView! {
         didSet {
-            //set gestures in here
+            let swipe = UISwipeGestureRecognizer(target: self, action: #selector(drawCards))
+            swipe.direction = .down
+            gameView.addGestureRecognizer(swipe)
         }
     }
     
@@ -30,12 +32,43 @@ class ViewController: UIViewController {
             game = Set()
             updateViewFromModel()
         } else if game.unPlayedCards.count > 0 {
-            game.drawMultipleCards(number: 3)
-            updateViewFromModel()
+            drawCards()
         }
     }
     
-    func updateViewFromModel() {
+    @IBAction func tapCard(_ sender: UITapGestureRecognizer) {
+        switch sender.state {
+        case .ended:
+            let touchLocation = sender.location(in: gameView)
+            if let cardsViews = gameView.cardViews {
+                for (index, card) in cardsViews.enumerated() {
+                    if card.frame.contains(touchLocation) {
+                        game.chooseCard(at: index)
+                        updateViewFromModel()
+                    }
+                }
+            }
+        default:
+            break
+        }
+    }
+    
+    @IBAction func rotateGameView(_ sender: UIRotationGestureRecognizer) {
+        switch sender.state {
+        case .ended:
+            game.shuffleCardsInPlay()
+            updateViewFromModel()
+        default:
+            break
+        }
+    }
+    
+    @objc func drawCards() {
+        game.drawMultipleCards(number: 3)
+        updateViewFromModel()
+    }
+    
+    private func updateViewFromModel() {
         scoreLabel.text = "Score: \(game.score)"
         
         if game.isComplete {
@@ -80,6 +113,18 @@ class ViewController: UIViewController {
                 cardView.shape = SetCardView.CardShape.squiggle
             case Card.CardProperty.tertiary:
                 cardView.shape = SetCardView.CardShape.oval
+            }
+            
+            if game.selectedCards.contains(card) {
+                if game.matchedCards.contains(card) {
+                    cardView.selectedColor = UIColor.green
+                } else if game.selectedCards.count == 3 {
+                    cardView.selectedColor = UIColor.red
+                } else {
+                    cardView.selectedColor = UIColor.blue
+                }
+            } else {
+                cardView.selectedColor = nil
             }
             cardViews.append(cardView)
         }

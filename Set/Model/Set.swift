@@ -33,12 +33,21 @@ class Set {
             }
         }
         
-        //Shuffle the cards
-        for k in stride(from: unPlayedCards.count - 1, to: 0, by: -1) {
-            unPlayedCards.swapAt(Int(arc4random_uniform(UInt32(k + 1))), k)
-        }
+        unPlayedCards = shuffleCards(inArray: unPlayedCards)
         
         drawMultipleCards(number: 12)
+    }
+    
+    private func shuffleCards(inArray cards: [Card]) -> [Card]{
+        var shuffledCards = cards
+        for k in stride(from: cards.count - 1, to: 0, by: -1) {
+            shuffledCards.swapAt(Int(arc4random_uniform(UInt32(k + 1))), k)
+        }
+        return shuffledCards
+    }
+    
+    func shuffleCardsInPlay() {
+        cardsInPlay = shuffleCards(inArray: cardsInPlay)
     }
     
     func chooseCard(at index: Int) {

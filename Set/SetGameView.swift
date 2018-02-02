@@ -13,7 +13,7 @@ class SetGameView: UIView {
     
     var cardViews: [SetCardView]? {
         didSet {
-            setNeedsLayout() 
+            setNeedsLayout()
         }
     }
     

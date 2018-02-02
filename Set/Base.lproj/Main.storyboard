@@ -38,6 +38,11 @@
                             <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WSG-E2-J24" customClass="SetGameView" customModule="Set" customModuleProvider="target">
                                 <rect key="frame" x="16" y="112" width="343" height="586"/>
                                 <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="nST-Wh-T4y" appends="YES" id="ey5-a3-dyb"/>
+                                    <outletCollection property="gestureRecognizers" destination="jaJ-kH-UOR" appends="YES" id="rah-6b-g8a"/>
+                                </connections>
                             </view>
                         </subviews>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -60,6 +65,16 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="nST-Wh-T4y">
+                    <connections>
+                        <action selector="tapCard:" destination="BYZ-38-t0r" id="a9d-1E-Vlf"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <rotationGestureRecognizer id="jaJ-kH-UOR">
+                    <connections>
+                        <action selector="rotateGameView:" destination="BYZ-38-t0r" id="XL5-wv-tdh"/>
+                    </connections>
+                </rotationGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="24.800000000000001" y="31.773399014778327"/>
         </scene>

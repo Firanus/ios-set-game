@@ -11,7 +11,6 @@ import UIKit
 @IBDesignable
 class SetCardView: UIView
 {
-    
     private enum CardOrientation {
         case vertical
         case horizontal
@@ -29,10 +28,12 @@ class SetCardView: UIView
         case oval
     }
     
-    var color: UIColor = UIColor.red  { didSet { setNeedsDisplay(); setNeedsLayout() } }
-    var shading: CardShading = .striped  { didSet { setNeedsDisplay(); setNeedsLayout() } }
-    var shape: CardShape = .squiggle  { didSet { setNeedsDisplay(); setNeedsLayout() } }
-    var number: Int = 3 { didSet { setNeedsDisplay(); setNeedsLayout() } }
+    var color: UIColor = UIColor.red  { didSet { setNeedsDisplay() } }
+    var shading: CardShading = .striped  { didSet { setNeedsDisplay() } }
+    var shape: CardShape = .oval  { didSet { setNeedsDisplay() } }
+    var number: Int = 3 { didSet { setNeedsDisplay() } }
+    
+    var selectedColor: UIColor? = nil
     
     private var orientation: CardOrientation {
         if bounds.height > bounds.width {
@@ -44,7 +45,7 @@ class SetCardView: UIView
     
     override func draw(_ rect: CGRect) {
         createCardBack()
-        createShapes(number: number, shape: shape, color: color, shading: shading)
+        createShapes()
     }
     
     override func layoutSubviews() {
@@ -58,8 +59,14 @@ class SetCardView: UIView
         roundedRect.addClip()
         UIColor.white.setFill()
         roundedRect.fill()
+        
+        if let outlineColor = selectedColor {
+            roundedRect.lineWidth = 5.0
+            outlineColor.setStroke()
+            roundedRect.stroke()
+        }
     }
-    private func createShapes(number: Int, shape: CardShape, color: UIColor, shading: CardShading) {
+    private func createShapes() {
         
         let maxDrawableArea = CGRect(x: bounds.minX + borderWidth, y: bounds.minY + borderHeight, width: bounds.width - (2 * borderWidth), height: bounds.height - (2 * borderHeight))
         
