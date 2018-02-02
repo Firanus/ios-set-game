@@ -15,6 +15,8 @@
 		F5DFBE20201749E700D732A6 /* Set.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE1F201749E700D732A6 /* Set.swift */; };
 		F5DFBE2220178FCE00D732A6 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE2120178FCE00D732A6 /* Card.swift */; };
 		F5DFBE262017AAB600D732A6 /* TripleComparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE252017AAB600D732A6 /* TripleComparable.swift */; };
+		F5E865CC2020D08600A52E05 /* SetCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E865CB2020D08600A52E05 /* SetCardView.swift */; };
+		F5E865CE2020DE5500A52E05 /* SetGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E865CD2020DE5500A52E05 /* SetGameView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +30,8 @@
 		F5DFBE1F201749E700D732A6 /* Set.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Set.swift; sourceTree = "<group>"; };
 		F5DFBE2120178FCE00D732A6 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		F5DFBE252017AAB600D732A6 /* TripleComparable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripleComparable.swift; sourceTree = "<group>"; };
+		F5E865CB2020D08600A52E05 /* SetCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetCardView.swift; sourceTree = "<group>"; };
+		F5E865CD2020DE5500A52E05 /* SetGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +64,8 @@
 		F5DFBE0C20173EDB00D732A6 /* Set */ = {
 			isa = PBXGroup;
 			children = (
+				F5E865CB2020D08600A52E05 /* SetCardView.swift */,
+				F5E865CD2020DE5500A52E05 /* SetGameView.swift */,
 				F5DFBE0D20173EDB00D732A6 /* AppDelegate.swift */,
 				F5DFBE0F20173EDB00D732A6 /* ViewController.swift */,
 				F5DFBE1120173EDB00D732A6 /* Main.storyboard */,
@@ -154,6 +160,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F5DFBE1020173EDB00D732A6 /* ViewController.swift in Sources */,
+				F5E865CC2020D08600A52E05 /* SetCardView.swift in Sources */,
+				F5E865CE2020DE5500A52E05 /* SetGameView.swift in Sources */,
 				F5DFBE0E20173EDB00D732A6 /* AppDelegate.swift in Sources */,
 				F5DFBE262017AAB600D732A6 /* TripleComparable.swift in Sources */,
 				F5DFBE20201749E700D732A6 /* Set.swift in Sources */,

@@ -18,25 +18,21 @@ class ViewController: UIViewController {
     }
     
     @IBOutlet weak var scoreLabel: UILabel!
-    @IBOutlet var cardButtons: [UIButton]!
     @IBOutlet weak var bottomButton: UIButton!
-    
-    @IBAction func touchCard(_ sender: UIButton) {
-        if let index = cardButtons.index(of: sender) {
-            game.chooseCard(at: index)
-            updateViewFromModel()
-        } else {
-            print("This card is not part of the cards array")
+    @IBOutlet weak var gameView: SetGameView! {
+        didSet {
+            //set gestures in here
         }
     }
     
     @IBAction func touchBottomButton(_ sender: UIButton) {
         if game.isComplete {
             game = Set()
-        } else if game.cardsInPlay.count < cardButtons.count {
+            updateViewFromModel()
+        } else if game.unPlayedCards.count > 0 {
             game.drawMultipleCards(number: 3)
+            updateViewFromModel()
         }
-        updateViewFromModel()
     }
     
     func updateViewFromModel() {
@@ -45,90 +41,48 @@ class ViewController: UIViewController {
         if game.isComplete {
             bottomButton.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
             bottomButton.setTitle("Start a New Game", for: UIControlState.normal)
-        } else if game.cardsInPlay.count < cardButtons.count {
+        } else if game.unPlayedCards.count > 0 {
             bottomButton.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
             bottomButton.setTitle("Draw 3 Cards", for: UIControlState.normal)
         } else {
             bottomButton.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
             bottomButton.setTitle("", for: UIControlState.normal)
         }
-        
-        for (index, button) in cardButtons.enumerated() {
-            if let card = index < game.cardsInPlay.count ? game.cardsInPlay[index] : nil {
-                button.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
-                button.setAttributedTitle(getSymbolFor(card: card), for: UIControlState.normal)
-                
-                if game.selectedCards.contains(card) {
-                    button.layer.borderWidth = 3.0
-                    if game.matchedCards.contains(card) {
-                        button.layer.borderColor = UIColor.green.cgColor
-                    } else if game.selectedCards.count == 3 {
-                        button.layer.borderColor = UIColor.red.cgColor
-                    } else {
-                        button.layer.borderColor = UIColor.blue.cgColor
-                    }
-                } else {
-                    button.layer.borderWidth = 0.0
-                    button.layer.borderColor = UIColor.white.cgColor
-                }
-            } else {
-                button.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
-                button.setAttributedTitle(NSAttributedString(), for: UIControlState.normal)
-                button.layer.borderWidth = 0.0
-                button.layer.borderColor = UIColor.white.cgColor
-            }
-        }
-    }
-    
-    var cardSymbols = [Card:NSAttributedString]()
-    
-    func getSymbolFor(card: Card) -> NSAttributedString {
-        if cardSymbols[card] == nil {
-            var attributes: [NSAttributedStringKey : Any] = [:]
-            var color: UIColor
+
+        var cardViews = [SetCardView]()
+        for card in game.cardsInPlay {
+            let cardView = SetCardView()
+            
+            cardView.number = card.number.rawValue
             
             switch card.color {
             case Card.CardProperty.primary:
-                    color = UIColor.red
+                    cardView.color = UIColor.red
             case Card.CardProperty.secondary:
-                    color = UIColor.green
+                    cardView.color = UIColor.green
             case Card.CardProperty.tertiary:
-                    color = UIColor.blue
+                    cardView.color = UIColor.blue
             }
             
             switch card.shading {
             case Card.CardProperty.primary:
-                attributes[.foregroundColor] = color.withAlphaComponent(1.0)
+                cardView.shading = SetCardView.CardShading.outline
             case Card.CardProperty.secondary:
-                attributes[.foregroundColor] = color.withAlphaComponent(0.15)
+                cardView.shading = SetCardView.CardShading.striped
             case Card.CardProperty.tertiary:
-                attributes[.strokeColor] = color
-                attributes[.strokeWidth] = 3.0
+                cardView.shading = SetCardView.CardShading.solid
             }
             
-            var proposedText = ""
-            switch (card.number, card.shape) {
-            case (Card.CardProperty.primary, Card.CardProperty.primary):
-                proposedText = "▲"
-            case (Card.CardProperty.primary, Card.CardProperty.secondary):
-                proposedText = "▲▲"
-            case (Card.CardProperty.primary, Card.CardProperty.tertiary):
-                proposedText = "▲▲▲"
-            case (Card.CardProperty.secondary, Card.CardProperty.primary):
-                proposedText = "●"
-            case (Card.CardProperty.secondary, Card.CardProperty.secondary):
-                proposedText = "●●"
-            case (Card.CardProperty.secondary, Card.CardProperty.tertiary):
-                proposedText = "●●●"
-            case (Card.CardProperty.tertiary, Card.CardProperty.primary):
-                proposedText = "■"
-            case (Card.CardProperty.tertiary, Card.CardProperty.secondary):
-                proposedText = "■■"
-            case (Card.CardProperty.tertiary, Card.CardProperty.tertiary):
-                proposedText = "■■■"
+            switch card.shape {
+            case Card.CardProperty.primary:
+                cardView.shape = SetCardView.CardShape.diamond
+            case Card.CardProperty.secondary:
+                cardView.shape = SetCardView.CardShape.squiggle
+            case Card.CardProperty.tertiary:
+                cardView.shape = SetCardView.CardShape.oval
             }
-            cardSymbols[card] = NSAttributedString(string: proposedText, attributes: attributes)
+            cardViews.append(cardView)
         }
-        return cardSymbols[card] ?? NSAttributedString()
+        gameView.cardViews = cardViews
     }
 }
