@@ -58,8 +58,13 @@ class Set {
             if selectedCards.count == 3 {
                 // Remove matched cards
                 if matchedCards.contains(selectedCards[0]){
-                    cardsInPlay = cardsInPlay.filter { !selectedCards.contains($0) }
-                    drawMultipleCards(number: 3)
+                    for (index,card) in cardsInPlay.enumerated() {
+                        if selectedCards.contains(card), !unPlayedCards.isEmpty {
+                            cardsInPlay[index] = unPlayedCards.popLast()!
+                        } else if unPlayedCards.isEmpty {
+                            cardsInPlay.remove(at: index)
+                        }
+                    }
                 }
                 indexOfPreviouslySelectedCard = nil
                 selectedCards.removeAll()
