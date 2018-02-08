@@ -14,11 +14,13 @@ class SetGameView: UIView {
     var cardViews: [SetCardView]? {
         didSet {
             setNeedsLayout()
+            if let cardCount = cardViews?.count {
+                cardsizeConstants = CardSizeConstants(forViewBounds: bounds, cardCount: cardCount)
+            }
         }
     }
     
-    private let cardSeperationToCardHeight: CGFloat = 0.025
-    private let cardSeperationToCardWidth: CGFloat = 0.05
+    var cardsizeConstants: CardSizeConstants?
     
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -33,31 +35,51 @@ class SetGameView: UIView {
     }
     
     private func arrangeCardViews() {
-        if let cards = cardViews {
-            let columnCount = bounds.height > bounds.width ? 4 : 6
-            let rowCount = Int(ceil(Double(cards.count) / Double(columnCount)))
-            
-            var cardWidth = bounds.width / CGFloat(columnCount)
-            var cardHeight = bounds.height / CGFloat(rowCount)
-            
-            let horizontalCardSeperation = cardWidth * cardSeperationToCardWidth
-            let verticalCardSeperation = cardHeight * cardSeperationToCardHeight
-            
-            cardWidth -= 2 * horizontalCardSeperation
-            cardHeight -= 2 * verticalCardSeperation
-            
-            for row in 0..<rowCount {
-                for column in 0..<columnCount {
-                    if row * columnCount + column < cards.count {
-                        let card = cards[row * columnCount + column]
-                        let xOrigin = bounds.origin.x + CGFloat(column) * cardWidth + (2 * CGFloat(column) + 1) * horizontalCardSeperation
-                        let yOrigin = bounds.origin.y + CGFloat(row) * cardHeight + (2 * CGFloat(row) + 1) * verticalCardSeperation
+        if let cards = cardViews, let constants = cardsizeConstants {
+            for row in 0..<constants.rowCount {
+                for column in 0..<constants.columnCount {
+                    if row * constants.columnCount + column < cards.count {
+                        let card = cards[row * constants.columnCount + column]
+                        let xOrigin = bounds.origin.x + CGFloat(column) * constants.cardWidth + (2 * CGFloat(column) + 1) * constants.horizontalCardSeperation
+                        let yOrigin = bounds.origin.y + CGFloat(row) * constants.cardHeight + (2 * CGFloat(row) + 1) * constants.verticalCardSeperation
                         card.frame.origin = CGPoint(x: xOrigin, y: yOrigin)
-                        card.frame.size = CGSize(width: cardWidth, height: cardHeight)
+                        card.frame.size = CGSize(width: constants.cardWidth, height: constants.cardHeight)
                         addSubview(card)
                     }
                 }
             }
+        }
+    }
+}
+
+extension SetGameView {
+    struct AnimationConsts {
+        static let dealingAnimationLength: TimeInterval = 0.6
+    }
+    
+    struct CardSizeConstants {
+        private let cardSeperationToCardHeight: CGFloat = 0.025
+        private let cardSeperationToCardWidth: CGFloat = 0.05
+        
+        let cardHeight: CGFloat
+        let cardWidth: CGFloat
+        let verticalCardSeperation: CGFloat
+        let horizontalCardSeperation: CGFloat
+        let columnCount: Int
+        let rowCount: Int
+        
+        init(forViewBounds bounds: CGRect, cardCount: Int) {
+            columnCount = bounds.height > bounds.width ? 4 : 6
+            rowCount = Int(ceil(Double(cardCount) / Double(columnCount)))
+            
+            let baseWidth = bounds.width / CGFloat(columnCount)
+            let baseHeight = bounds.height / CGFloat(rowCount)
+            
+            horizontalCardSeperation = baseWidth * cardSeperationToCardWidth
+            verticalCardSeperation = baseHeight * cardSeperationToCardHeight
+            
+            cardWidth = baseWidth - 2 * horizontalCardSeperation
+            cardHeight = baseHeight - 2 * verticalCardSeperation
         }
     }
 }
