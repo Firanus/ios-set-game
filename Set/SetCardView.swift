@@ -33,7 +33,7 @@ class SetCardView: UIView
     var shape: CardShape = .oval  { didSet { setNeedsDisplay() } }
     var number: Int = 3 { didSet { setNeedsDisplay() } }
     
-    var selectedColor: UIColor? = nil
+    var selectedColor: UIColor? = nil { didSet { setNeedsDisplay() } }
     
     private var orientation: CardOrientation {
         if bounds.height > bounds.width {
