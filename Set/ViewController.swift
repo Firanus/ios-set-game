@@ -159,16 +159,15 @@ class ViewController: UIViewController {
         let cardView = getCardView(for: card)
         if game.selectedCards.contains(card) {
             if game.matchedCards.contains(card) {
-                cardView.selectedColor = UIColor.green
+                cardView.outlineColor = UIColor.green
             } else if game.selectedCards.count == 3 {
-                cardView.selectedColor = UIColor.red
+                cardView.outlineColor = UIColor.red
             } else {
-                cardView.selectedColor = UIColor.blue
+                cardView.outlineColor = UIColor.blue
             }
         } else {
-            cardView.selectedColor = nil
+            cardView.outlineColor = nil
         }
-        cardViews[card] = cardView
     }
     
     private func positionCard(_ card: Card, rowIndex row: Int, columnIndex column: Int) {
@@ -181,7 +180,6 @@ class ViewController: UIViewController {
         cardView.frame.origin = CGPoint(x: xOrigin, y: yOrigin)
         cardView.frame.size = CGSize(width: constants.cardWidth, height: constants.cardHeight)
         
-        cardViews[card] = cardView
         gameView.addSubview(cardView)
     }
 }
