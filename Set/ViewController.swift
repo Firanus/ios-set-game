@@ -11,7 +11,23 @@ import UIKit
 class ViewController: UIViewController {
     
     var game = Set()
-    var cardViews = [SetCardView]()
+    var constants: CardSizeConstants {
+        return CardSizeConstants(forViewBounds: gameView.bounds, cardCount: game.cardsInPlay.count)
+    }
+    
+    let deckLocation = CGPoint(x: 100, y: 100)
+    var cardViews = [Card: SetCardView]()
+    
+    func getCardView(for card: Card) -> SetCardView {
+        if cardViews[card] == nil {
+            cardViews[card] = makeCardViewFromCard(card)
+        }
+        return cardViews[card] ?? SetCardView()
+    }
+    
+    func location(for card: Card) -> CGPoint {
+        return getCardView(for: card).frame.origin
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,10 +58,15 @@ class ViewController: UIViewController {
         switch sender.state {
         case .ended:
             let touchLocation = sender.location(in: gameView)
-            for (index, card) in cardViews.enumerated() {
-                if card.frame.contains(touchLocation) {
-                    game.chooseCard(at: index)
-                    updateViewFromModel()
+            for cardView in cardViews.values {
+                if cardView.frame.contains(touchLocation) {
+                    let cards = cardViews.keysForValue(value: cardView)
+                    if cards.count == 1 {
+                        game.chooseCard(cards[0])
+                        updateViewFromModel()
+                    } else {
+                        assertionFailure("There is not a 1 to 1 relationship between cards and cardViews")
+                    }
                 }
             }
         default:
@@ -73,14 +94,14 @@ class ViewController: UIViewController {
         
         drawBottomButton()
         
-        cardViews = []
-        
-        for card in game.cardsInPlay {
-            let cardView = makeCardViewFromCard(card)
-            cardViews.append(cardView)
+        for subUIView in gameView.subviews {
+            subUIView.removeFromSuperview()
         }
         
-        arrangeCardViews()
+        for (index,card) in game.cardsInPlay.enumerated() {
+            outlineCard(card)
+            positionCard(card, rowIndex: index / constants.columnCount, columnIndex: index % constants.columnCount)
+        }
     }
     
     private func drawBottomButton() {
@@ -128,6 +149,14 @@ class ViewController: UIViewController {
             cardView.shape = SetCardView.CardShape.oval
         }
         
+        cardView.frame.origin = deckLocation
+        cardView.frame.size = CGSize.zero
+        
+        return cardView
+    }
+    
+    private func outlineCard(_ card: Card) {
+        let cardView = getCardView(for: card)
         if game.selectedCards.contains(card) {
             if game.matchedCards.contains(card) {
                 cardView.selectedColor = UIColor.green
@@ -139,28 +168,36 @@ class ViewController: UIViewController {
         } else {
             cardView.selectedColor = nil
         }
-        return cardView
+        cardViews[card] = cardView
     }
     
-    private func arrangeCardViews() {
-        for subUIView in gameView.subviews {
-            subUIView.removeFromSuperview()
-        }
+    private func positionCard(_ card: Card, rowIndex row: Int, columnIndex column: Int) {
+        let cardView = getCardView(for: card)
         
-        let constants = CardSizeConstants(forViewBounds: gameView.bounds, cardCount: cardViews.count)
+        let xOrigin = gameView.bounds.origin.x + CGFloat(column) * constants.cardWidth + (2 * CGFloat(column) + 1) * constants.horizontalCardSeperation
+        let yOrigin = gameView.bounds.origin.y + CGFloat(row) * constants.cardHeight + (2 * CGFloat(row) + 1) * constants.verticalCardSeperation
         
-        for row in 0..<constants.rowCount {
-            for column in 0..<constants.columnCount {
-                if row * constants.columnCount + column < cardViews.count {
-                    let card = cardViews[row * constants.columnCount + column]
-                    let xOrigin = gameView.bounds.origin.x + CGFloat(column) * constants.cardWidth + (2 * CGFloat(column) + 1) * constants.horizontalCardSeperation
-                    let yOrigin = gameView.bounds.origin.y + CGFloat(row) * constants.cardHeight + (2 * CGFloat(row) + 1) * constants.verticalCardSeperation
-                    card.frame.origin = CGPoint(x: xOrigin, y: yOrigin)
-                    card.frame.size = CGSize(width: constants.cardWidth, height: constants.cardHeight)
-                    card.alpha = 1
-                    gameView.addSubview(card)
-                }
-            }
+        cardView.alpha = 1
+        cardView.frame.origin = CGPoint(x: xOrigin, y: yOrigin)
+        cardView.frame.size = CGSize(width: constants.cardWidth, height: constants.cardHeight)
+        
+        cardViews[card] = cardView
+        gameView.addSubview(cardView)
+    }
+}
+
+
+extension Dictionary where Value: Equatable {
+    /// Returns all keys mapped to the specified value.
+    /// ```
+    /// let dict = ["A": 1, "B": 2, "C": 3]
+    /// let keys = dict.keysForValue(2)
+    /// assert(keys == ["B"])
+    /// assert(dict["B"] == 2)
+    /// ```
+    func keysForValue(value: Value) -> [Key] {
+        return flatMap { (key: Key, val: Value) -> Key? in
+            value == val ? key : nil
         }
     }
 }

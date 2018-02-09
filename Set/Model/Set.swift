@@ -50,41 +50,44 @@ class Set {
         cardsInPlay = shuffleCards(inArray: cardsInPlay)
     }
     
+    func chooseCard(_ card: Card) {
+        var indexOfPreviouslySelectedCard = selectedCards.index(of: card)
+        
+        if selectedCards.count == 3 {
+            // Remove matched cards
+            if matchedCards.contains(selectedCards[0]){
+                for (index,card) in cardsInPlay.enumerated() {
+                    if selectedCards.contains(card), !unPlayedCards.isEmpty {
+                        cardsInPlay[index] = unPlayedCards.popLast()!
+                    } else if unPlayedCards.isEmpty {
+                        cardsInPlay.remove(at: index)
+                    }
+                }
+            }
+            indexOfPreviouslySelectedCard = nil
+            selectedCards.removeAll()
+        } else if selectedCards.count == 2 {
+            //score successful and unsuccessful matches
+            if Card.doFormSetOfThree(first: selectedCards[0], second: selectedCards[1], third: card) {
+                score += 3
+                
+                matchedCards.append(card)
+                matchedCards.append(contentsOf: selectedCards)
+            } else {
+                score -= 5
+            }
+        }
+        if indexOfPreviouslySelectedCard != nil {
+            selectedCards.remove(at: indexOfPreviouslySelectedCard!)
+        } else {
+            selectedCards.append(card)
+        }
+    }
+    
     func chooseCard(at index: Int) {
         if index < cardsInPlay.count {
             let selectedCard = cardsInPlay[index]
-            var indexOfPreviouslySelectedCard = selectedCards.index(of: selectedCard)
-            
-            if selectedCards.count == 3 {
-                // Remove matched cards
-                if matchedCards.contains(selectedCards[0]){
-                    for (index,card) in cardsInPlay.enumerated() {
-                        if selectedCards.contains(card), !unPlayedCards.isEmpty {
-                            cardsInPlay[index] = unPlayedCards.popLast()!
-                        } else if unPlayedCards.isEmpty {
-                            cardsInPlay.remove(at: index)
-                        }
-                    }
-                }
-                indexOfPreviouslySelectedCard = nil
-                selectedCards.removeAll()
-            } else if selectedCards.count == 2 {
-                //score successful and unsuccessful matches
-                if Card.doFormSetOfThree(first: selectedCards[0], second: selectedCards[1], third: selectedCard) {
-                    score += 3
-                    
-                    matchedCards.append(selectedCard)
-                    matchedCards.append(contentsOf: selectedCards)
-                } else {
-                    score -= 5
-                }
-            }
-            if indexOfPreviouslySelectedCard != nil {
-                selectedCards.remove(at: indexOfPreviouslySelectedCard!)
-            } else {
-                selectedCards.append(selectedCard)
-            }
-            
+            chooseCard(selectedCard)
         }
     }
     
