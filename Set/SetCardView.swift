@@ -33,7 +33,7 @@ class SetCardView: UIView
     var shape: CardShape = .oval  { didSet { setNeedsDisplay() } }
     var number: Int = 3 { didSet { setNeedsDisplay() } }
     
-    var selectedColor: UIColor? = nil { didSet { setNeedsDisplay() } }
+    var outlineColor: UIColor? = nil { didSet { setNeedsDisplay() } }
     
     private var orientation: CardOrientation {
         if bounds.height > bounds.width {
@@ -60,7 +60,7 @@ class SetCardView: UIView
         UIColor.white.setFill()
         roundedRect.fill()
         
-        if let outlineColor = selectedColor {
+        if let outlineColor = outlineColor {
             roundedRect.lineWidth = 5.0
             outlineColor.setStroke()
             roundedRect.stroke()

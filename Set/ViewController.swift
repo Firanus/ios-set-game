@@ -117,14 +117,14 @@ class ViewController: UIViewController {
             
             if game.selectedCards.contains(card) {
                 if game.matchedCards.contains(card) {
-                    cardView.selectedColor = UIColor.green
+                    cardView.outlineColor = UIColor.green
                 } else if game.selectedCards.count == 3 {
-                    cardView.selectedColor = UIColor.red
+                    cardView.outlineColor = UIColor.red
                 } else {
-                    cardView.selectedColor = UIColor.blue
+                    cardView.outlineColor = UIColor.blue
                 }
             } else {
-                cardView.selectedColor = nil
+                cardView.outlineColor = nil
             }
             cardViews.append(cardView)
         }
