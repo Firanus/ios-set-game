@@ -32,6 +32,7 @@ class SetCardView: UIView
     var shading: CardShading = .striped  { didSet { setNeedsDisplay() } }
     var shape: CardShape = .oval  { didSet { setNeedsDisplay() } }
     var number: Int = 3 { didSet { setNeedsDisplay() } }
+    var isFaceUp: Bool = false { didSet { setNeedsDisplay() } }
     
     var outlineColor: UIColor? = nil { didSet { setNeedsDisplay() } }
     
@@ -45,7 +46,15 @@ class SetCardView: UIView
     
     override func draw(_ rect: CGRect) {
         createCardBack()
-        createShapes()
+        if isFaceUp {
+            createShapes()
+        }
+    }
+    
+    override func setNeedsDisplay() {
+        super.setNeedsDisplay()
+        
+        self.isOpaque = false
     }
     
     override func layoutSubviews() {
@@ -57,14 +66,21 @@ class SetCardView: UIView
     private func createCardBack() {
         let roundedRect = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius)
         roundedRect.addClip()
-        UIColor.white.setFill()
-        roundedRect.fill()
-        
-        if let outlineColor = outlineColor {
-            roundedRect.lineWidth = 5.0
-            outlineColor.setStroke()
-            roundedRect.stroke()
+        if isFaceUp {
+            UIColor.white.setFill()
+            if let outlineColor = outlineColor {
+                roundedRect.lineWidth = 5.0
+                outlineColor.setStroke()
+            }
+        } else {
+            UIColor(rgbColorCodeRed: 255, green: 50, blue: 60, alpha: 1.0).setFill()
+            roundedRect.fill()
+            roundedRect.lineWidth = 2.0
+            UIColor.white.setStroke()
         }
+        roundedRect.fill()
+        roundedRect.stroke()
+        
     }
     private func createShapes() {
         
@@ -231,13 +247,17 @@ class SetCardView: UIView
 
 extension SetCardView {
     private struct SizeRatio {
-        static let cornerRadiusToBoundsHeight: CGFloat = 0.06
+        static let cornerRadiusToMaximalBoundsDimension: CGFloat = 0.06
         static let cardBorderToBoundsRatio: CGFloat = 0.1
         static let internalBorderToBoundsRatio: CGFloat = 0.025
     }
     
     private var cornerRadius: CGFloat {
-        return SizeRatio.cornerRadiusToBoundsHeight * bounds.height
+        if bounds.height > bounds.width {
+            return SizeRatio.cornerRadiusToMaximalBoundsDimension * bounds.height
+        } else {
+            return SizeRatio.cornerRadiusToMaximalBoundsDimension * bounds.width
+        }
     }
     
     private var borderHeight: CGFloat {
@@ -254,5 +274,18 @@ extension SetCardView {
     
     private var internalBorderWidth: CGFloat {
         return SizeRatio.internalBorderToBoundsRatio * bounds.width
+    }
+}
+
+extension UIColor {
+    
+    convenience init(rgbColorCodeRed red: Int, green: Int, blue: Int, alpha: CGFloat) {
+        
+        let redPart: CGFloat = CGFloat(red) / 255
+        let greenPart: CGFloat = CGFloat(green) / 255
+        let bluePart: CGFloat = CGFloat(blue) / 255
+        
+        self.init(red: redPart, green: greenPart, blue: bluePart, alpha: alpha)
+        
     }
 }

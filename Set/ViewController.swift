@@ -11,17 +11,31 @@ import UIKit
 class ViewController: UIViewController {
     
     var game = Set()
-    var constants: CardSizeConstants {
-        return CardSizeConstants(forViewBounds: gameView.bounds, cardCount: game.cardsInPlay.count)
+    var cardConstants: CardSizeConstants {
+        return CardSizeConstants(forViewBounds: CGRect(
+            x: gameView.bounds.origin.x,
+            y: gameView.bounds.origin.y,
+            width: gameView.bounds.width,
+            height: gameView.bounds.height * (1 - bottomViewToBoundsHeightRatio)
+        ), cardCount: game.cardsInPlay.count)
     }
+    let bottomViewToBoundsHeightRatio: CGFloat = 0.1
+    lazy var deckConstants = DeckSizeConstants(forViewBounds:
+        CGRect(
+            x: gameView.bounds.origin.x,
+            y: gameView.bounds.origin.y + gameView.bounds.height * (1 - bottomViewToBoundsHeightRatio),
+            width: gameView.bounds.width,
+            height: gameView.bounds.height * bottomViewToBoundsHeightRatio))
     
-    let deckLocation = CGPoint(x: 100, y: 100)
+    var deckView: SetCardView?
+    var discardPileView: SetCardView?
     var cardViews = [Card: SetCardView]()
     
     func getCardView(for card: Card) -> SetCardView {
         if cardViews[card] == nil {
             cardViews[card] = makeCardViewFromCard(card)
         }
+        
         return cardViews[card] ?? SetCardView()
     }
     
@@ -36,7 +50,8 @@ class ViewController: UIViewController {
     }
     
     @IBOutlet weak var scoreLabel: UILabel!
-    @IBOutlet weak var bottomButton: UIButton!
+//    @IBOutlet weak var bottomButton: UIButton!
+//    @IBOutlet weak var bottomView: UIView!
     @IBOutlet weak var gameView: UIView! {
         didSet {
             let swipe = UISwipeGestureRecognizer(target: self, action: #selector(drawCards))
@@ -45,14 +60,14 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBAction func touchBottomButton(_ sender: UIButton) {
-        if game.isComplete {
-            game = Set()
-            updateViewFromModel()
-        } else if game.unPlayedCards.count > 0 {
-            drawCards()
-        }
-    }
+//    @IBAction func touchBottomButton(_ sender: UIButton) {
+//        if game.isComplete {
+//            game = Set()
+//            updateViewFromModel()
+//        } else if game.unPlayedCards.count > 0 {
+//            drawCards()
+//        }
+//    }
     
     @IBAction func tapCard(_ sender: UITapGestureRecognizer) {
         switch sender.state {
@@ -92,29 +107,59 @@ class ViewController: UIViewController {
     private func updateViewFromModel() {
         scoreLabel.text = "Score: \(game.score)"
         
-        drawBottomButton()
         
         for subUIView in gameView.subviews {
             subUIView.removeFromSuperview()
         }
         
+        drawDecks()
+        
+        var newCardCount = 0
         for (index,card) in game.cardsInPlay.enumerated() {
+            let cardView = getCardView(for: card)
             outlineCard(card)
-            positionCard(card, rowIndex: index / constants.columnCount, columnIndex: index % constants.columnCount)
+            if cardView.frame.origin == deckView?.frame.origin { newCardCount += 1 }
+            let animationDelay = TimeInterval(newCardCount) * animationConstants.drawingAnimationDuration
+            positionCard(card, rowIndex: index / cardConstants.columnCount, columnIndex: index % cardConstants.columnCount, animationDelay: animationDelay)
         }
     }
     
-    private func drawBottomButton() {
-        if game.isComplete {
-            bottomButton.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-            bottomButton.setTitle("Start a New Game", for: UIControlState.normal)
-        } else if game.unPlayedCards.count > 0 {
-            bottomButton.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-            bottomButton.setTitle("Draw 3 Cards", for: UIControlState.normal)
+//    private func drawBottomButton() {
+//        if game.isComplete {
+//            bottomButton.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+//            bottomButton.setTitle("Start a New Game", for: UIControlState.normal)
+//        } else if game.unPlayedCards.count > 0 {
+//            bottomButton.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
+//            bottomButton.setTitle("Draw 3 Cards", for: UIControlState.normal)
+//        } else {
+//            bottomButton.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+//            bottomButton.setTitle("", for: UIControlState.normal)
+//        }
+//    }
+    
+    private func drawDecks() {
+        if !game.unPlayedCards.isEmpty {
+            deckView = SetCardView()
+            deckView!.frame = deckConstants.deckRect
+            gameView.addSubview(deckView!)
         } else {
-            bottomButton.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
-            bottomButton.setTitle("", for: UIControlState.normal)
+            if let visibleDeckView = deckView {
+                visibleDeckView.removeFromSuperview()
+                deckView = nil
+            }
         }
+        
+        if !game.matchedCards.isEmpty {
+            discardPileView = SetCardView()
+            discardPileView!.frame = deckConstants.discardPileRect
+            gameView.addSubview(discardPileView!)
+        } else {
+            if let visibleDiscardPile = discardPileView {
+                visibleDiscardPile.removeFromSuperview()
+                discardPileView = nil
+            }
+        }
+        gameView.setNeedsDisplay()
     }
     
     private func makeCardViewFromCard(_ card: Card) -> SetCardView {
@@ -149,8 +194,8 @@ class ViewController: UIViewController {
             cardView.shape = SetCardView.CardShape.oval
         }
         
-        cardView.frame.origin = deckLocation
-        cardView.frame.size = CGSize.zero
+        
+        cardView.frame = deckView?.frame ?? CGRect.zero
         
         return cardView
     }
@@ -170,20 +215,57 @@ class ViewController: UIViewController {
         }
     }
     
-    private func positionCard(_ card: Card, rowIndex row: Int, columnIndex column: Int) {
+    private func positionCard(_ card: Card, rowIndex row: Int, columnIndex column: Int, animationDelay: TimeInterval = 0.0) {
         let cardView = getCardView(for: card)
         
-        let xOrigin = gameView.bounds.origin.x + CGFloat(column) * constants.cardWidth + (2 * CGFloat(column) + 1) * constants.horizontalCardSeperation
-        let yOrigin = gameView.bounds.origin.y + CGFloat(row) * constants.cardHeight + (2 * CGFloat(row) + 1) * constants.verticalCardSeperation
+        let xOrigin = gameView.bounds.origin.x + CGFloat(column) * cardConstants.cardWidth + (2 * CGFloat(column) + 1) * cardConstants.horizontalCardSeperation
+        let yOrigin = gameView.bounds.origin.y + CGFloat(row) * cardConstants.cardHeight + (2 * CGFloat(row) + 1) * cardConstants.verticalCardSeperation
+        let cardSize = CGSize(width: cardConstants.cardWidth, height: cardConstants.cardHeight)
         
         cardView.alpha = 1
-        cardView.frame.origin = CGPoint(x: xOrigin, y: yOrigin)
-        cardView.frame.size = CGSize(width: constants.cardWidth, height: constants.cardHeight)
+        
+        if cardView.frame.origin == deckView?.frame.origin {
+            UIViewPropertyAnimator.runningPropertyAnimator(
+                withDuration: animationConstants.drawingAnimationDuration,
+                delay: animationDelay,
+                options: [],
+                animations: {
+                    cardView.transform = CGAffineTransform.identity
+                    if cardView.frame.width > cardView.frame.height {
+                        cardView.transform = cardView.transform.rotated(by: CGFloat.pi / 2)
+                    }
+                    cardView.frame.origin = CGPoint(x: xOrigin, y: yOrigin)
+                    cardView.frame.size = cardSize
+                }, completion: { finished in
+                    if !cardView.isFaceUp {
+                        UIView.transition(
+                            with: cardView,
+                            duration: animationConstants.flippingAnimationDuration,
+                            options: [.transitionFlipFromLeft],
+                            animations: {
+                                cardView.isFaceUp = true
+                        })
+                    }
+            })
+        } else if cardView.frame.origin != CGPoint(x: xOrigin, y: yOrigin) {
+            UIViewPropertyAnimator.runningPropertyAnimator(
+                withDuration: animationConstants.drawingAnimationDuration,
+                delay: 0,
+                options: [],
+                animations: {
+                    cardView.frame.origin = CGPoint(x: xOrigin, y: yOrigin)
+                    cardView.frame.size = cardSize
+            })
+        }
         
         gameView.addSubview(cardView)
     }
+    
+    struct animationConstants {
+        static let drawingAnimationDuration: TimeInterval = 0.6
+        static let flippingAnimationDuration: TimeInterval = 0.5
+    }
 }
-
 
 extension Dictionary where Value: Equatable {
     /// Returns all keys mapped to the specified value.

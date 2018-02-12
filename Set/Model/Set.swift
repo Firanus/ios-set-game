@@ -95,8 +95,6 @@ class Set {
         if !unPlayedCards.isEmpty && unPlayedCards.count >= number {
             cardsInPlay.append(contentsOf: unPlayedCards[0..<number])
             unPlayedCards.removeSubrange(0..<number)
-        } else {
-            assertionFailure("You've tried to draw more cards than there are in the deck.")
         }
     }
 }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		F5534EAA202C6D8600DEEC91 /* CardSizeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5534EA9202C6D8600DEEC91 /* CardSizeConstants.swift */; };
+		F5534EAE202DE88600DEEC91 /* DeckSizeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5534EAD202DE88600DEEC91 /* DeckSizeConstants.swift */; };
 		F5DFBE0E20173EDB00D732A6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE0D20173EDB00D732A6 /* AppDelegate.swift */; };
 		F5DFBE1020173EDB00D732A6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE0F20173EDB00D732A6 /* ViewController.swift */; };
 		F5DFBE1320173EDB00D732A6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5DFBE1120173EDB00D732A6 /* Main.storyboard */; };
@@ -21,6 +22,7 @@
 
 /* Begin PBXFileReference section */
 		F5534EA9202C6D8600DEEC91 /* CardSizeConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSizeConstants.swift; sourceTree = "<group>"; };
+		F5534EAD202DE88600DEEC91 /* DeckSizeConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckSizeConstants.swift; sourceTree = "<group>"; };
 		F5DFBE0A20173EDB00D732A6 /* Set.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Set.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5DFBE0D20173EDB00D732A6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5DFBE0F20173EDB00D732A6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -65,6 +67,8 @@
 			isa = PBXGroup;
 			children = (
 				F5E865CB2020D08600A52E05 /* SetCardView.swift */,
+				F5534EA9202C6D8600DEEC91 /* CardSizeConstants.swift */,
+				F5534EAD202DE88600DEEC91 /* DeckSizeConstants.swift */,
 				F5DFBE0D20173EDB00D732A6 /* AppDelegate.swift */,
 				F5DFBE0F20173EDB00D732A6 /* ViewController.swift */,
 				F5DFBE1120173EDB00D732A6 /* Main.storyboard */,
@@ -72,7 +76,6 @@
 				F5DFBE1620173EDB00D732A6 /* LaunchScreen.storyboard */,
 				F5DFBE1920173EDB00D732A6 /* Info.plist */,
 				F5E865C62020BCA800A52E05 /* Model */,
-				F5534EA9202C6D8600DEEC91 /* CardSizeConstants.swift */,
 			);
 			path = Set;
 			sourceTree = "<group>";
@@ -161,6 +164,7 @@
 			files = (
 				F5DFBE1020173EDB00D732A6 /* ViewController.swift in Sources */,
 				F5E865CC2020D08600A52E05 /* SetCardView.swift in Sources */,
+				F5534EAE202DE88600DEEC91 /* DeckSizeConstants.swift in Sources */,
 				F5DFBE0E20173EDB00D732A6 /* AppDelegate.swift in Sources */,
 				F5534EAA202C6D8600DEEC91 /* CardSizeConstants.swift in Sources */,
 				F5DFBE262017AAB600D732A6 /* TripleComparable.swift in Sources */,
