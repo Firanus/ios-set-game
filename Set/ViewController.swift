@@ -19,6 +19,7 @@ class ViewController: UIViewController {
             height: gameView.bounds.height * (1 - bottomViewToBoundsHeightRatio)
         ), cardCount: game.cardsInPlay.count)
     }
+    
     let bottomViewToBoundsHeightRatio: CGFloat = 0.1
     lazy var deckConstants = DeckSizeConstants(forViewBounds:
         CGRect(
@@ -30,6 +31,11 @@ class ViewController: UIViewController {
     var deckView: SetCardView?
     var discardPileView: SetCardView?
     var cardViews = [Card: SetCardView]()
+    
+    lazy var animator = UIDynamicAnimator(referenceView: gameView)
+    var snapBehaviour: UISnapBehavior!
+    
+    private weak var timer: Timer?
     
     func getCardView(for card: Card) -> SetCardView {
         if cardViews[card] == nil {
@@ -73,14 +79,18 @@ class ViewController: UIViewController {
         switch sender.state {
         case .ended:
             let touchLocation = sender.location(in: gameView)
-            for cardView in cardViews.values {
-                if cardView.frame.contains(touchLocation) {
-                    let cards = cardViews.keysForValue(value: cardView)
-                    if cards.count == 1 {
-                        game.chooseCard(cards[0])
-                        updateViewFromModel()
-                    } else {
-                        assertionFailure("There is not a 1 to 1 relationship between cards and cardViews")
+            if deckConstants.deckRect.contains(touchLocation) && game.unPlayedCards.count > 0 {
+                drawCards()
+            } else {
+                for cardView in cardViews.values {
+                    if cardView.frame.contains(touchLocation) {
+                        let cards = cardViews.keysForValue(value: cardView)
+                        if cards.count == 1 {
+                            game.chooseCard(cards[0])
+                            updateViewFromModel()
+                        } else {
+                            assertionFailure("There is not a 1 to 1 relationship between cards and cardViews")
+                        }
                     }
                 }
             }
@@ -107,37 +117,32 @@ class ViewController: UIViewController {
     private func updateViewFromModel() {
         scoreLabel.text = "Score: \(game.score)"
         
+        drawDeck()
         
-        for subUIView in gameView.subviews {
-            subUIView.removeFromSuperview()
+        var positionCardsAnimationDelay: TimeInterval = 0
+        for card in cardViews.keys {
+            if !game.cardsInPlay.contains(card) {
+                positionCardsAnimationDelay = animationConstants.freeFloatAnimationDuration
+                animateRemoval(of: card)
+                if let index = cardViews.index(forKey: card) {
+                    cardViews.remove(at: index)
+                }
+            }
         }
         
-        drawDecks()
-        
-        var newCardCount = 0
+        var newCardCount = -1
         for (index,card) in game.cardsInPlay.enumerated() {
-            let cardView = getCardView(for: card)
+            
             outlineCard(card)
+            
+            let cardView = getCardView(for: card)
             if cardView.frame.origin == deckView?.frame.origin { newCardCount += 1 }
-            let animationDelay = TimeInterval(newCardCount) * animationConstants.drawingAnimationDuration
+            let animationDelay = positionCardsAnimationDelay + TimeInterval(newCardCount) * animationConstants.drawingAnimationDuration
             positionCard(card, rowIndex: index / cardConstants.columnCount, columnIndex: index % cardConstants.columnCount, animationDelay: animationDelay)
         }
     }
     
-//    private func drawBottomButton() {
-//        if game.isComplete {
-//            bottomButton.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-//            bottomButton.setTitle("Start a New Game", for: UIControlState.normal)
-//        } else if game.unPlayedCards.count > 0 {
-//            bottomButton.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-//            bottomButton.setTitle("Draw 3 Cards", for: UIControlState.normal)
-//        } else {
-//            bottomButton.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
-//            bottomButton.setTitle("", for: UIControlState.normal)
-//        }
-//    }
-    
-    private func drawDecks() {
+    private func drawDeck() {
         if !game.unPlayedCards.isEmpty {
             deckView = SetCardView()
             deckView!.frame = deckConstants.deckRect
@@ -148,18 +153,6 @@ class ViewController: UIViewController {
                 deckView = nil
             }
         }
-        
-        if !game.matchedCards.isEmpty {
-            discardPileView = SetCardView()
-            discardPileView!.frame = deckConstants.discardPileRect
-            gameView.addSubview(discardPileView!)
-        } else {
-            if let visibleDiscardPile = discardPileView {
-                visibleDiscardPile.removeFromSuperview()
-                discardPileView = nil
-            }
-        }
-        gameView.setNeedsDisplay()
     }
     
     private func makeCardViewFromCard(_ card: Card) -> SetCardView {
@@ -200,12 +193,52 @@ class ViewController: UIViewController {
         return cardView
     }
     
+    private func animateRemoval(of card: Card){
+        let cardView = getCardView(for: card)
+        
+        let pushBehaviour = UIPushBehavior(items: [cardView], mode: .instantaneous)
+        pushBehaviour.magnitude = 1.0
+        pushBehaviour.angle = (CGFloat.pi * 2) * CGFloat(Float(arc4random()) / Float(UINT32_MAX))
+
+        cardView.layer.zPosition += 100
+        animator.addBehavior(pushBehaviour)
+        
+        timer = Timer.scheduledTimer(withTimeInterval: animationConstants.freeFloatAnimationDuration, repeats: false) { timer in
+            pushBehaviour.removeItem(cardView)
+            pushBehaviour.dynamicAnimator?.removeBehavior(pushBehaviour)
+            UIViewPropertyAnimator.runningPropertyAnimator(
+                withDuration: animationConstants.sendToDiscardPileAnimationDuration,
+                delay: 0.0,
+                options: [],
+                animations: {
+                    cardView.frame.size = self.deckConstants.discardPileRect.size
+                    cardView.frame.origin = self.deckConstants.discardPileRect.origin
+            }, completion: { finished in
+                if cardView.isFaceUp {
+                    UIView.transition(
+                        with: cardView,
+                        duration: animationConstants.flippingAnimationDuration,
+                        options: [.transitionFlipFromLeft],
+                        animations: {
+                            cardView.isFaceUp = false
+                    }, completion: { [weak self] finished in
+                        if let realSelf = self, self?.discardPileView == nil {
+                            let newDiscardPile = SetCardView()
+                            newDiscardPile.frame = realSelf.deckConstants.discardPileRect
+                            realSelf.gameView.addSubview(newDiscardPile)
+                            realSelf.discardPileView = newDiscardPile
+                        }
+                        cardView.removeFromSuperview()
+                    })
+                }
+            })
+        }
+    }
+    
     private func outlineCard(_ card: Card) {
         let cardView = getCardView(for: card)
         if game.selectedCards.contains(card) {
-            if game.matchedCards.contains(card) {
-                cardView.outlineColor = UIColor.green
-            } else if game.selectedCards.count == 3 {
+            if game.selectedCards.count == 3 {
                 cardView.outlineColor = UIColor.red
             } else {
                 cardView.outlineColor = UIColor.blue
@@ -262,8 +295,10 @@ class ViewController: UIViewController {
     }
     
     struct animationConstants {
-        static let drawingAnimationDuration: TimeInterval = 0.6
+        static let drawingAnimationDuration: TimeInterval = 0.4
         static let flippingAnimationDuration: TimeInterval = 0.5
+        static let freeFloatAnimationDuration: TimeInterval = 0.8
+        static let sendToDiscardPileAnimationDuration: TimeInterval = 0.2
     }
 }
 

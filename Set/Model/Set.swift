@@ -54,33 +54,35 @@ class Set {
         var indexOfPreviouslySelectedCard = selectedCards.index(of: card)
         
         if selectedCards.count == 3 {
-            // Remove matched cards
-            if matchedCards.contains(selectedCards[0]){
-                for (index,card) in cardsInPlay.enumerated() {
-                    if selectedCards.contains(card), !unPlayedCards.isEmpty {
-                        cardsInPlay[index] = unPlayedCards.popLast()!
-                    } else if unPlayedCards.isEmpty {
-                        cardsInPlay.remove(at: index)
-                    }
-                }
-            }
             indexOfPreviouslySelectedCard = nil
             selectedCards.removeAll()
         } else if selectedCards.count == 2 {
             //score successful and unsuccessful matches
             if Card.doFormSetOfThree(first: selectedCards[0], second: selectedCards[1], third: card) {
                 score += 3
+                let newMatchedCards = [selectedCards[0], selectedCards[1], card]
                 
-                matchedCards.append(card)
-                matchedCards.append(contentsOf: selectedCards)
+                matchedCards.append(contentsOf: newMatchedCards)
+                for matchedCard in newMatchedCards {
+                    let inPlayIndex = cardsInPlay.index(of: matchedCard)
+                    if let index = inPlayIndex {
+                        if !unPlayedCards.isEmpty {
+                            cardsInPlay[index] = unPlayedCards.popLast()!
+                        } else {
+                            cardsInPlay.remove(at: index)
+                        }
+                    }
+                }
+                indexOfPreviouslySelectedCard = nil
+                selectedCards.removeAll()
             } else {
                 score -= 5
             }
         }
-        if indexOfPreviouslySelectedCard != nil {
-            selectedCards.remove(at: indexOfPreviouslySelectedCard!)
-        } else {
+        if indexOfPreviouslySelectedCard == nil && !matchedCards.contains(card) {
             selectedCards.append(card)
+        } else if let index = indexOfPreviouslySelectedCard {
+            selectedCards.remove(at: index)
         }
     }
     
