@@ -50,36 +50,46 @@ class Set {
         cardsInPlay = shuffleCards(inArray: cardsInPlay)
     }
     
-    func chooseCard(at index: Int) {
-        if index < cardsInPlay.count {
-            let selectedCard = cardsInPlay[index]
-            var indexOfPreviouslySelectedCard = selectedCards.index(of: selectedCard)
-            
-            if selectedCards.count == 3 {
-                // Remove matched cards
-                if matchedCards.contains(selectedCards[0]){
-                    cardsInPlay = cardsInPlay.filter { !selectedCards.contains($0) }
-                    drawMultipleCards(number: 3)
+    func chooseCard(_ card: Card) {
+        var indexOfPreviouslySelectedCard = selectedCards.index(of: card)
+        
+        if selectedCards.count == 3 {
+            indexOfPreviouslySelectedCard = nil
+            selectedCards.removeAll()
+        } else if selectedCards.count == 2 {
+            //score successful and unsuccessful matches
+            if Card.doFormSetOfThree(first: selectedCards[0], second: selectedCards[1], third: card) {
+                score += 3
+                let newMatchedCards = [selectedCards[0], selectedCards[1], card]
+                
+                matchedCards.append(contentsOf: newMatchedCards)
+                for matchedCard in newMatchedCards {
+                    let inPlayIndex = cardsInPlay.index(of: matchedCard)
+                    if let index = inPlayIndex {
+                        if !unPlayedCards.isEmpty {
+                            cardsInPlay[index] = unPlayedCards.popLast()!
+                        } else {
+                            cardsInPlay.remove(at: index)
+                        }
+                    }
                 }
                 indexOfPreviouslySelectedCard = nil
                 selectedCards.removeAll()
-            } else if selectedCards.count == 2 {
-                //score successful and unsuccessful matches
-                if Card.doFormSetOfThree(first: selectedCards[0], second: selectedCards[1], third: selectedCard) {
-                    score += 3
-                    
-                    matchedCards.append(selectedCard)
-                    matchedCards.append(contentsOf: selectedCards)
-                } else {
-                    score -= 5
-                }
-            }
-            if indexOfPreviouslySelectedCard != nil {
-                selectedCards.remove(at: indexOfPreviouslySelectedCard!)
             } else {
-                selectedCards.append(selectedCard)
+                score -= 5
             }
-            
+        }
+        if indexOfPreviouslySelectedCard == nil && !matchedCards.contains(card) {
+            selectedCards.append(card)
+        } else if let index = indexOfPreviouslySelectedCard {
+            selectedCards.remove(at: index)
+        }
+    }
+    
+    func chooseCard(at index: Int) {
+        if index < cardsInPlay.count {
+            let selectedCard = cardsInPlay[index]
+            chooseCard(selectedCard)
         }
     }
     
@@ -87,8 +97,6 @@ class Set {
         if !unPlayedCards.isEmpty && unPlayedCards.count >= number {
             cardsInPlay.append(contentsOf: unPlayedCards[0..<number])
             unPlayedCards.removeSubrange(0..<number)
-        } else {
-            assertionFailure("You've tried to draw more cards than there are in the deck.")
         }
     }
 }

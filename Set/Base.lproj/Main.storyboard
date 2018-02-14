@@ -18,26 +18,15 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HDu-uB-sUr">
-                                <rect key="frame" x="43" y="706" width="289" height="72"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="50"/>
-                                <state key="normal" title="Draw 3 Cards">
-                                    <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
-                                </state>
-                                <connections>
-                                    <action selector="touchBottomButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Fmd-Zl-PkX"/>
-                                </connections>
-                            </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Score: 0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fqo-OF-k7X">
                                 <rect key="frame" x="99.000000000000014" y="44" width="177.33333333333337" height="60"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="50"/>
                                 <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WSG-E2-J24" customClass="SetGameView" customModule="Set" customModuleProvider="target">
-                                <rect key="frame" x="16" y="112" width="343" height="586"/>
-                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WSG-E2-J24">
+                                <rect key="frame" x="16" y="112" width="343" height="666"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <gestureRecognizers/>
                                 <connections>
                                     <outletCollection property="gestureRecognizers" destination="nST-Wh-T4y" appends="YES" id="ey5-a3-dyb"/>
@@ -45,21 +34,18 @@
                                 </connections>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" red="0.15686274509803921" green="0.59215686274509804" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="WSG-E2-J24" secondAttribute="bottom" id="1xl-uP-LFz"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="WSG-E2-J24" secondAttribute="trailing" constant="16" id="IRA-si-jWw"/>
                             <constraint firstItem="WSG-E2-J24" firstAttribute="top" secondItem="fqo-OF-k7X" secondAttribute="bottom" constant="8" id="KSB-Dn-weR"/>
-                            <constraint firstItem="HDu-uB-sUr" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="W3m-tj-y87"/>
                             <constraint firstItem="fqo-OF-k7X" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="a3P-cJ-IJB"/>
                             <constraint firstItem="fqo-OF-k7X" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="cHZ-fS-zPZ"/>
-                            <constraint firstItem="HDu-uB-sUr" firstAttribute="top" secondItem="WSG-E2-J24" secondAttribute="bottom" constant="8" id="fdn-4d-Ar3"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="HDu-uB-sUr" secondAttribute="bottom" id="sVV-r5-kZx"/>
                             <constraint firstItem="WSG-E2-J24" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="uab-UY-uo1"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
-                        <outlet property="bottomButton" destination="HDu-uB-sUr" id="N6I-vh-hCO"/>
                         <outlet property="gameView" destination="WSG-E2-J24" id="Hh6-C7-CwL"/>
                         <outlet property="scoreLabel" destination="fqo-OF-k7X" id="B1C-Yc-Xhp"/>
                     </connections>

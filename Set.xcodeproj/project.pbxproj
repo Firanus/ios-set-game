@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F5534EAA202C6D8600DEEC91 /* CardSizeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5534EA9202C6D8600DEEC91 /* CardSizeConstants.swift */; };
+		F5534EAE202DE88600DEEC91 /* DeckSizeConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5534EAD202DE88600DEEC91 /* DeckSizeConstants.swift */; };
 		F5DFBE0E20173EDB00D732A6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE0D20173EDB00D732A6 /* AppDelegate.swift */; };
 		F5DFBE1020173EDB00D732A6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE0F20173EDB00D732A6 /* ViewController.swift */; };
 		F5DFBE1320173EDB00D732A6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F5DFBE1120173EDB00D732A6 /* Main.storyboard */; };
@@ -16,10 +18,11 @@
 		F5DFBE2220178FCE00D732A6 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE2120178FCE00D732A6 /* Card.swift */; };
 		F5DFBE262017AAB600D732A6 /* TripleComparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5DFBE252017AAB600D732A6 /* TripleComparable.swift */; };
 		F5E865CC2020D08600A52E05 /* SetCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E865CB2020D08600A52E05 /* SetCardView.swift */; };
-		F5E865CE2020DE5500A52E05 /* SetGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E865CD2020DE5500A52E05 /* SetGameView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F5534EA9202C6D8600DEEC91 /* CardSizeConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardSizeConstants.swift; sourceTree = "<group>"; };
+		F5534EAD202DE88600DEEC91 /* DeckSizeConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckSizeConstants.swift; sourceTree = "<group>"; };
 		F5DFBE0A20173EDB00D732A6 /* Set.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Set.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5DFBE0D20173EDB00D732A6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F5DFBE0F20173EDB00D732A6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -31,7 +34,6 @@
 		F5DFBE2120178FCE00D732A6 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		F5DFBE252017AAB600D732A6 /* TripleComparable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripleComparable.swift; sourceTree = "<group>"; };
 		F5E865CB2020D08600A52E05 /* SetCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetCardView.swift; sourceTree = "<group>"; };
-		F5E865CD2020DE5500A52E05 /* SetGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,7 +67,8 @@
 			isa = PBXGroup;
 			children = (
 				F5E865CB2020D08600A52E05 /* SetCardView.swift */,
-				F5E865CD2020DE5500A52E05 /* SetGameView.swift */,
+				F5534EA9202C6D8600DEEC91 /* CardSizeConstants.swift */,
+				F5534EAD202DE88600DEEC91 /* DeckSizeConstants.swift */,
 				F5DFBE0D20173EDB00D732A6 /* AppDelegate.swift */,
 				F5DFBE0F20173EDB00D732A6 /* ViewController.swift */,
 				F5DFBE1120173EDB00D732A6 /* Main.storyboard */,
@@ -161,8 +164,9 @@
 			files = (
 				F5DFBE1020173EDB00D732A6 /* ViewController.swift in Sources */,
 				F5E865CC2020D08600A52E05 /* SetCardView.swift in Sources */,
-				F5E865CE2020DE5500A52E05 /* SetGameView.swift in Sources */,
+				F5534EAE202DE88600DEEC91 /* DeckSizeConstants.swift in Sources */,
 				F5DFBE0E20173EDB00D732A6 /* AppDelegate.swift in Sources */,
+				F5534EAA202C6D8600DEEC91 /* CardSizeConstants.swift in Sources */,
 				F5DFBE262017AAB600D732A6 /* TripleComparable.swift in Sources */,
 				F5DFBE20201749E700D732A6 /* Set.swift in Sources */,
 				F5DFBE2220178FCE00D732A6 /* Card.swift in Sources */,

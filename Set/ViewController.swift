@@ -9,17 +9,74 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
     var game = Set()
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    
+    let bottomViewToBoundsHeightRatio: CGFloat = 0.11
+    let sideViewToBoundsWidthRatio: CGFloat = 0.14
+    var cardConstants: CardSizeConstants {
+        if gameView.bounds.height > gameView.bounds.width {
+            return CardSizeConstants(forGameSize: CGSize(
+                width: gameView.bounds.width,
+                height: gameView.bounds.height * (1 - bottomViewToBoundsHeightRatio)
+            ), cardCount: game.cardsInPlay.count)
+        } else {
+            return CardSizeConstants(forGameSize: CGSize(
+                width: gameView.bounds.width * (1 - sideViewToBoundsWidthRatio),
+                height: gameView.bounds.height
+            ), cardCount: game.cardsInPlay.count)
+        }
+    }
+    
+    var deckConstants: DeckSizeConstants {
+        if gameView.bounds.height > gameView.bounds.width {
+            return DeckSizeConstants(forViewBounds:
+                CGRect(
+                    x: gameView.bounds.origin.x,
+                    y: gameView.bounds.origin.y + gameView.bounds.height * (1 - bottomViewToBoundsHeightRatio),
+                    width: gameView.bounds.width,
+                    height: gameView.bounds.height * bottomViewToBoundsHeightRatio))
+        } else {
+            return DeckSizeConstants(forViewBounds:
+                CGRect(
+                    x: gameView.bounds.origin.x,
+                    y: gameView.bounds.origin.y,
+                    width: gameView.bounds.width * sideViewToBoundsWidthRatio,
+                    height: gameView.bounds.height))
+        }
+    }
+    
+    var deckView: SetCardView?
+    var discardPileView: SetCardView?
+    var cardViews = [Card: SetCardView]()
+    
+    lazy var animator = UIDynamicAnimator(referenceView: gameView)
+    var snapBehaviour: UISnapBehavior!
+    
+    private weak var timer: Timer?
+    
+    func getCardView(for card: Card) -> SetCardView {
+        if cardViews[card] == nil {
+            cardViews[card] = makeCardViewFromCard(card)
+        }
+        
+        return cardViews[card] ?? SetCardView()
+    }
+    
+    func location(for card: Card) -> CGPoint {
+        return getCardView(for: card).frame.origin
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
         
         updateViewFromModel()
     }
     
     @IBOutlet weak var scoreLabel: UILabel!
-    @IBOutlet weak var bottomButton: UIButton!
-    @IBOutlet weak var gameView: SetGameView! {
+//    @IBOutlet weak var bottomButton: UIButton!
+//    @IBOutlet weak var bottomView: UIView!
+    @IBOutlet weak var gameView: UIView! {
         didSet {
             let swipe = UISwipeGestureRecognizer(target: self, action: #selector(drawCards))
             swipe.direction = .down
@@ -27,24 +84,31 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBAction func touchBottomButton(_ sender: UIButton) {
-        if game.isComplete {
-            game = Set()
-            updateViewFromModel()
-        } else if game.unPlayedCards.count > 0 {
-            drawCards()
-        }
-    }
+//    @IBAction func touchBottomButton(_ sender: UIButton) {
+//        if game.isComplete {
+//            game = Set()
+//            updateViewFromModel()
+//        } else if game.unPlayedCards.count > 0 {
+//            drawCards()
+//        }
+//    }
     
     @IBAction func tapCard(_ sender: UITapGestureRecognizer) {
         switch sender.state {
         case .ended:
             let touchLocation = sender.location(in: gameView)
-            if let cardsViews = gameView.cardViews {
-                for (index, card) in cardsViews.enumerated() {
-                    if card.frame.contains(touchLocation) {
-                        game.chooseCard(at: index)
-                        updateViewFromModel()
+            if deckConstants.deckRect.contains(touchLocation) && game.unPlayedCards.count > 0 {
+                drawCards()
+            } else {
+                for cardView in cardViews.values {
+                    if cardView.frame.contains(touchLocation) {
+                        let cards = cardViews.keysForValue(value: cardView)
+                        if cards.count == 1 {
+                            game.chooseCard(cards[0])
+                            updateViewFromModel()
+                        } else {
+                            assertionFailure("There is not a 1 to 1 relationship between cards and cardViews")
+                        }
                     }
                 }
             }
@@ -71,63 +135,216 @@ class ViewController: UIViewController {
     private func updateViewFromModel() {
         scoreLabel.text = "Score: \(game.score)"
         
-        if game.isComplete {
-            bottomButton.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-            bottomButton.setTitle("Start a New Game", for: UIControlState.normal)
-        } else if game.unPlayedCards.count > 0 {
-            bottomButton.backgroundColor = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
-            bottomButton.setTitle("Draw 3 Cards", for: UIControlState.normal)
-        } else {
-            bottomButton.backgroundColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
-            bottomButton.setTitle("", for: UIControlState.normal)
-        }
-
-        var cardViews = [SetCardView]()
-        for card in game.cardsInPlay {
-            let cardView = SetCardView()
-            
-            cardView.number = card.number.rawValue
-            
-            switch card.color {
-            case Card.CardProperty.primary:
-                    cardView.color = UIColor.red
-            case Card.CardProperty.secondary:
-                    cardView.color = UIColor.green
-            case Card.CardProperty.tertiary:
-                    cardView.color = UIColor.blue
-            }
-            
-            switch card.shading {
-            case Card.CardProperty.primary:
-                cardView.shading = SetCardView.CardShading.outline
-            case Card.CardProperty.secondary:
-                cardView.shading = SetCardView.CardShading.striped
-            case Card.CardProperty.tertiary:
-                cardView.shading = SetCardView.CardShading.solid
-            }
-            
-            switch card.shape {
-            case Card.CardProperty.primary:
-                cardView.shape = SetCardView.CardShape.diamond
-            case Card.CardProperty.secondary:
-                cardView.shape = SetCardView.CardShape.squiggle
-            case Card.CardProperty.tertiary:
-                cardView.shape = SetCardView.CardShape.oval
-            }
-            
-            if game.selectedCards.contains(card) {
-                if game.matchedCards.contains(card) {
-                    cardView.outlineColor = UIColor.green
-                } else if game.selectedCards.count == 3 {
-                    cardView.outlineColor = UIColor.red
-                } else {
-                    cardView.outlineColor = UIColor.blue
+        drawDeck()
+        drawDiscardPile()
+        
+        var positionCardsAnimationDelay: TimeInterval = 0
+        for card in cardViews.keys {
+            if !game.cardsInPlay.contains(card) {
+                positionCardsAnimationDelay = animationConstants.freeFloatAnimationDuration
+                animateRemoval(of: card)
+                if let index = cardViews.index(forKey: card) {
+                    cardViews.remove(at: index)
                 }
-            } else {
-                cardView.outlineColor = nil
             }
-            cardViews.append(cardView)
         }
-        gameView.cardViews = cardViews
+        
+        var newCardCount = -1
+        for (index,card) in game.cardsInPlay.enumerated() {
+            
+            outlineCard(card)
+            
+            let cardView = getCardView(for: card)
+            if cardView.frame.origin == deckView?.frame.origin { newCardCount += 1 }
+            let animationDelay = positionCardsAnimationDelay + TimeInterval(newCardCount) * animationConstants.drawingAnimationDuration
+            positionCard(card, rowIndex: index / cardConstants.columnCount, columnIndex: index % cardConstants.columnCount, animationDelay: animationDelay)
+        }
+    }
+    
+    private func drawDeck() {
+        if let visibleDeckView = deckView {
+            visibleDeckView.removeFromSuperview()
+            deckView = nil
+        }
+        if !game.unPlayedCards.isEmpty {
+            deckView = SetCardView()
+            deckView!.frame = deckConstants.deckRect
+            gameView.addSubview(deckView!)
+        }
+    }
+    
+    private func drawDiscardPile() {
+        //we only draw a discard pile if there already is one, to avoid drawing it before the first card match animation has completed.
+        if let visibleDiscardPileView = discardPileView {
+            visibleDiscardPileView.removeFromSuperview()
+            discardPileView = SetCardView()
+            discardPileView!.frame = deckConstants.discardPileRect
+            gameView.addSubview(discardPileView!)
+        }
+    }
+    
+    private func makeCardViewFromCard(_ card: Card) -> SetCardView {
+        let cardView = SetCardView()
+        
+        cardView.number = card.number.rawValue
+        
+        switch card.color {
+        case Card.CardProperty.primary:
+            cardView.color = UIColor.red
+        case Card.CardProperty.secondary:
+            cardView.color = UIColor.green
+        case Card.CardProperty.tertiary:
+            cardView.color = UIColor.blue
+        }
+        
+        switch card.shading {
+        case Card.CardProperty.primary:
+            cardView.shading = SetCardView.CardShading.outline
+        case Card.CardProperty.secondary:
+            cardView.shading = SetCardView.CardShading.striped
+        case Card.CardProperty.tertiary:
+            cardView.shading = SetCardView.CardShading.solid
+        }
+        
+        switch card.shape {
+        case Card.CardProperty.primary:
+            cardView.shape = SetCardView.CardShape.diamond
+        case Card.CardProperty.secondary:
+            cardView.shape = SetCardView.CardShape.squiggle
+        case Card.CardProperty.tertiary:
+            cardView.shape = SetCardView.CardShape.oval
+        }
+        
+        
+        cardView.frame = deckView?.frame ?? CGRect.zero
+        
+        return cardView
+    }
+    
+    private func animateRemoval(of card: Card){
+        let cardView = getCardView(for: card)
+        
+        let pushBehaviour = UIPushBehavior(items: [cardView], mode: .instantaneous)
+        pushBehaviour.magnitude = 1.0
+        pushBehaviour.angle = (CGFloat.pi * 2) * CGFloat(Float(arc4random()) / Float(UINT32_MAX))
+
+        cardView.layer.zPosition += 100
+        animator.addBehavior(pushBehaviour)
+        
+        timer = Timer.scheduledTimer(withTimeInterval: animationConstants.freeFloatAnimationDuration, repeats: false) { timer in
+            pushBehaviour.removeItem(cardView)
+            pushBehaviour.dynamicAnimator?.removeBehavior(pushBehaviour)
+            UIViewPropertyAnimator.runningPropertyAnimator(
+                withDuration: animationConstants.sendToDiscardPileAnimationDuration,
+                delay: 0.0,
+                options: [],
+                animations: {
+                    cardView.frame.size = self.deckConstants.discardPileRect.size
+                    cardView.frame.origin = self.deckConstants.discardPileRect.origin
+            }, completion: { finished in
+                if cardView.isFaceUp {
+                    UIView.transition(
+                        with: cardView,
+                        duration: animationConstants.flippingAnimationDuration,
+                        options: [.transitionFlipFromLeft],
+                        animations: {
+                            cardView.isFaceUp = false
+                    }, completion: { [weak self] finished in
+                        if let realSelf = self, self?.discardPileView == nil {
+                            let newDiscardPile = SetCardView()
+                            newDiscardPile.frame = realSelf.deckConstants.discardPileRect
+                            realSelf.gameView.addSubview(newDiscardPile)
+                            realSelf.discardPileView = newDiscardPile
+                        }
+                        cardView.removeFromSuperview()
+                    })
+                }
+            })
+        }
+    }
+    
+    private func outlineCard(_ card: Card) {
+        let cardView = getCardView(for: card)
+        if game.selectedCards.contains(card) {
+            if game.selectedCards.count == 3 {
+                cardView.outlineColor = UIColor.red
+            } else {
+                cardView.outlineColor = UIColor.blue
+            }
+        } else {
+            cardView.outlineColor = nil
+        }
+    }
+    
+    private func positionCard(_ card: Card, rowIndex row: Int, columnIndex column: Int, animationDelay: TimeInterval = 0.0) {
+        let cardView = getCardView(for: card)
+        
+        var xOrigin = gameView.bounds.origin.x + CGFloat(column) * cardConstants.cardWidth + (2 * CGFloat(column) + 1) * cardConstants.horizontalCardSeperation
+        let yOrigin = gameView.bounds.origin.y + CGFloat(row) * cardConstants.cardHeight + (2 * CGFloat(row) + 1) * cardConstants.verticalCardSeperation
+        let cardSize = CGSize(width: cardConstants.cardWidth, height: cardConstants.cardHeight)
+        
+        if gameView.bounds.height < gameView.bounds.width {
+            xOrigin += gameView.bounds.width * sideViewToBoundsWidthRatio
+        }
+        
+        cardView.alpha = 1
+        
+        if cardView.frame.origin == deckView?.frame.origin {
+            UIViewPropertyAnimator.runningPropertyAnimator(
+                withDuration: animationConstants.drawingAnimationDuration,
+                delay: animationDelay,
+                options: [],
+                animations: {
+                    cardView.transform = CGAffineTransform.identity
+                    if cardView.frame.width > cardView.frame.height {
+                        cardView.transform = cardView.transform.rotated(by: CGFloat.pi / 2)
+                    }
+                    cardView.frame.origin = CGPoint(x: xOrigin, y: yOrigin)
+                    cardView.frame.size = cardSize
+                }, completion: { finished in
+                    if !cardView.isFaceUp {
+                        UIView.transition(
+                            with: cardView,
+                            duration: animationConstants.flippingAnimationDuration,
+                            options: [.transitionFlipFromLeft],
+                            animations: {
+                                cardView.isFaceUp = true
+                        })
+                    }
+            })
+        } else if cardView.frame.origin != CGPoint(x: xOrigin, y: yOrigin) {
+            UIViewPropertyAnimator.runningPropertyAnimator(
+                withDuration: animationConstants.drawingAnimationDuration,
+                delay: 0,
+                options: [],
+                animations: {
+                    cardView.frame.origin = CGPoint(x: xOrigin, y: yOrigin)
+                    cardView.frame.size = cardSize
+            })
+        }
+        
+        gameView.addSubview(cardView)
+    }
+    
+    struct animationConstants {
+        static let drawingAnimationDuration: TimeInterval = 0.4
+        static let flippingAnimationDuration: TimeInterval = 0.5
+        static let freeFloatAnimationDuration: TimeInterval = 0.8
+        static let sendToDiscardPileAnimationDuration: TimeInterval = 0.2
+    }
+}
+
+extension Dictionary where Value: Equatable {
+    /// Returns all keys mapped to the specified value.
+    /// ```
+    /// let dict = ["A": 1, "B": 2, "C": 3]
+    /// let keys = dict.keysForValue(2)
+    /// assert(keys == ["B"])
+    /// assert(dict["B"] == 2)
+    /// ```
+    func keysForValue(value: Value) -> [Key] {
+        return flatMap { (key: Key, val: Value) -> Key? in
+            value == val ? key : nil
+        }
     }
 }
