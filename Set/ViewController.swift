@@ -11,22 +11,40 @@ import UIKit
 class ViewController: UIViewController {
     
     var game = Set()
+    
+    let bottomViewToBoundsHeightRatio: CGFloat = 0.11
+    let sideViewToBoundsWidthRatio: CGFloat = 0.14
     var cardConstants: CardSizeConstants {
-        return CardSizeConstants(forViewBounds: CGRect(
-            x: gameView.bounds.origin.x,
-            y: gameView.bounds.origin.y,
-            width: gameView.bounds.width,
-            height: gameView.bounds.height * (1 - bottomViewToBoundsHeightRatio)
-        ), cardCount: game.cardsInPlay.count)
+        if gameView.bounds.height > gameView.bounds.width {
+            return CardSizeConstants(forGameSize: CGSize(
+                width: gameView.bounds.width,
+                height: gameView.bounds.height * (1 - bottomViewToBoundsHeightRatio)
+            ), cardCount: game.cardsInPlay.count)
+        } else {
+            return CardSizeConstants(forGameSize: CGSize(
+                width: gameView.bounds.width * (1 - sideViewToBoundsWidthRatio),
+                height: gameView.bounds.height
+            ), cardCount: game.cardsInPlay.count)
+        }
     }
     
-    let bottomViewToBoundsHeightRatio: CGFloat = 0.1
-    lazy var deckConstants = DeckSizeConstants(forViewBounds:
-        CGRect(
-            x: gameView.bounds.origin.x,
-            y: gameView.bounds.origin.y + gameView.bounds.height * (1 - bottomViewToBoundsHeightRatio),
-            width: gameView.bounds.width,
-            height: gameView.bounds.height * bottomViewToBoundsHeightRatio))
+    var deckConstants: DeckSizeConstants {
+        if gameView.bounds.height > gameView.bounds.width {
+            return DeckSizeConstants(forViewBounds:
+                CGRect(
+                    x: gameView.bounds.origin.x,
+                    y: gameView.bounds.origin.y + gameView.bounds.height * (1 - bottomViewToBoundsHeightRatio),
+                    width: gameView.bounds.width,
+                    height: gameView.bounds.height * bottomViewToBoundsHeightRatio))
+        } else {
+            return DeckSizeConstants(forViewBounds:
+                CGRect(
+                    x: gameView.bounds.origin.x,
+                    y: gameView.bounds.origin.y,
+                    width: gameView.bounds.width * sideViewToBoundsWidthRatio,
+                    height: gameView.bounds.height))
+        }
+    }
     
     var deckView: SetCardView?
     var discardPileView: SetCardView?
@@ -49,8 +67,8 @@ class ViewController: UIViewController {
         return getCardView(for: card).frame.origin
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
         
         updateViewFromModel()
     }
@@ -118,6 +136,7 @@ class ViewController: UIViewController {
         scoreLabel.text = "Score: \(game.score)"
         
         drawDeck()
+        drawDiscardPile()
         
         var positionCardsAnimationDelay: TimeInterval = 0
         for card in cardViews.keys {
@@ -143,15 +162,24 @@ class ViewController: UIViewController {
     }
     
     private func drawDeck() {
+        if let visibleDeckView = deckView {
+            visibleDeckView.removeFromSuperview()
+            deckView = nil
+        }
         if !game.unPlayedCards.isEmpty {
             deckView = SetCardView()
             deckView!.frame = deckConstants.deckRect
             gameView.addSubview(deckView!)
-        } else {
-            if let visibleDeckView = deckView {
-                visibleDeckView.removeFromSuperview()
-                deckView = nil
-            }
+        }
+    }
+    
+    private func drawDiscardPile() {
+        //we only draw a discard pile if there already is one, to avoid drawing it before the first card match animation has completed.
+        if let visibleDiscardPileView = discardPileView {
+            visibleDiscardPileView.removeFromSuperview()
+            discardPileView = SetCardView()
+            discardPileView!.frame = deckConstants.discardPileRect
+            gameView.addSubview(discardPileView!)
         }
     }
     
@@ -251,9 +279,13 @@ class ViewController: UIViewController {
     private func positionCard(_ card: Card, rowIndex row: Int, columnIndex column: Int, animationDelay: TimeInterval = 0.0) {
         let cardView = getCardView(for: card)
         
-        let xOrigin = gameView.bounds.origin.x + CGFloat(column) * cardConstants.cardWidth + (2 * CGFloat(column) + 1) * cardConstants.horizontalCardSeperation
+        var xOrigin = gameView.bounds.origin.x + CGFloat(column) * cardConstants.cardWidth + (2 * CGFloat(column) + 1) * cardConstants.horizontalCardSeperation
         let yOrigin = gameView.bounds.origin.y + CGFloat(row) * cardConstants.cardHeight + (2 * CGFloat(row) + 1) * cardConstants.verticalCardSeperation
         let cardSize = CGSize(width: cardConstants.cardWidth, height: cardConstants.cardHeight)
+        
+        if gameView.bounds.height < gameView.bounds.width {
+            xOrigin += gameView.bounds.width * sideViewToBoundsWidthRatio
+        }
         
         cardView.alpha = 1
         

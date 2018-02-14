@@ -20,12 +20,12 @@ struct CardSizeConstants {
     let columnCount: Int
     let rowCount: Int
     
-    init(forViewBounds bounds: CGRect, cardCount: Int) {
-        columnCount = bounds.height > bounds.width ? 4 : 6
+    init(forGameSize size: CGSize, cardCount: Int) {
+        columnCount = size.height > size.width ? 4 : 6
         rowCount = Int(ceil(Double(cardCount) / Double(columnCount)))
         
-        let baseWidth = bounds.width / CGFloat(columnCount)
-        let baseHeight = bounds.height / CGFloat(rowCount)
+        let baseWidth = size.width / CGFloat(columnCount)
+        let baseHeight = size.height / CGFloat(rowCount)
         
         horizontalCardSeperation = baseWidth * cardSeperationToCardWidth
         verticalCardSeperation = baseHeight * cardSeperationToCardHeight
